@@ -52,8 +52,17 @@ async function refreshSummary() {
   }
 }
 
+/** Background triggers that may be skipped when a sync ran moments ago (saves egress). */
+const THROTTLED_REASONS = new Set(['foreground', 'interval']);
+const AUTO_SYNC_MIN_GAP_MS = 2 * 60_000;
+const AUTO_SYNC_INTERVAL_MS = 15 * 60_000;
+
 export async function syncNow(reason = 'manual'): Promise<SyncReport | null> {
   if (!getOpenDbUserId()) return null;
+  if (THROTTLED_REASONS.has(reason)) {
+    const { lastSyncAt, queue: pending } = useSyncStore.getState();
+    if (pending.pending === 0 && lastSyncAt && Date.now() - Date.parse(lastSyncAt) < AUTO_SYNC_MIN_GAP_MS) return null;
+  }
   if (!isEffectivelyOnline()) {
     useSyncStore.setState({ phase: 'offline' });
     return null;
@@ -137,7 +146,7 @@ export function startAutoSync() {
   });
   const interval = setInterval(() => {
     if (AppState.currentState === 'active') void syncNow('interval');
-  }, 5 * 60_000);
+  }, AUTO_SYNC_INTERVAL_MS);
   const changeUnsub = subscribeChanges((topics) => {
     if (topics.has('sync')) void refreshSummary();
   });

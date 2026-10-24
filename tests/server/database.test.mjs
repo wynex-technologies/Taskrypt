@@ -259,3 +259,10 @@ describe('account deletion cascade', () => {
     }
   });
 });
+
+describe('keepalive', () => {
+  it('is callable with the anon key and reveals nothing but a boolean', async () => {
+    const r = await as(null, (tx) => tx.query('select public.keepalive() as ok'));
+    assert.deepEqual(r.rows, [{ ok: true }]);
+  });
+});

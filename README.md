@@ -63,6 +63,13 @@ Without credentials the app boots to a **"Connect a backend"** screen — it nev
    npx supabase functions deploy delete-account
    ```
 8. Optional housekeeping (prunes the idempotency log and 60-day-old tombstones) with pg_cron — see `supabase/seed.sql`.
+9. **Keep the project from pausing (free plan).** The workflow `.github/workflows/supabase-keepalive.yml` at the repository root calls the `keepalive` RPC every 2 days. Add repository secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public anon key only), then run it once from the Actions tab. Without GitHub, any external cron can `POST <url>/rest/v1/rpc/keepalive` with headers `apikey` and `Authorization: Bearer <anon key>`.
+
+### Staying inside the egress quota
+
+- Sync is delta-only (server `updated_at` cursor); background syncs are skipped if one ran in the last 2 minutes, and the periodic sync runs every 15 minutes while the app is open.
+- A document is downloaded at most once per device: the first open keeps an encrypted offline copy, so later opens are local.
+- Watch **Usage** in the Supabase dashboard. The only hard guarantee against pauses and quota restrictions is the Pro plan (keep the spend cap on so overage can never bill you).
 
 ### Environment variables
 

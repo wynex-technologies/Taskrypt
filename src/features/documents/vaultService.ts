@@ -383,6 +383,14 @@ export async function openPlaintext(doc: LocalDocument, displayName = doc.name):
   } else {
     const downloaded = await downloadPlaintext(doc);
     await verifyChecksum(downloaded, doc);
+    // Keep an encrypted offline copy so reopening never downloads it again (storage egress).
+    try {
+      const out = offlineFile(userId, doc.id);
+      await encryptFile(downloaded, out, doc.id, await getOrCreateVaultKey(userId), progress(doc.id, 'encrypting'));
+      await documentRepository.setOffline(doc.id, 'available', out.uri, out.size);
+    } catch (e) {
+      log.warn('could not keep offline copy', { code: toAppError(e).code });
+    }
     file = tempFile(displayName);
     downloaded.move(file);
   }
