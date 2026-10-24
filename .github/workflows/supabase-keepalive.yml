@@ -1,0 +1,47 @@
+# Keeps the Taskrypt Supabase project (TO-DO App) from being paused for inactivity.
+# Free-plan projects pause after ~7 days without database activity; this pings a
+# tiny RPC (supabase/migrations/20261025000000_keepalive.sql) every 2 days.
+#
+# Repository secrets required (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL       https://<project-ref>.supabase.co
+#   SUPABASE_ANON_KEY  the PUBLIC anon / publishable key (never the service-role key)
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '23 5 */2 * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL / SUPABASE_ANON_KEY secrets are not set"
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error \
+            --retry 5 --retry-delay 30 --retry-all-errors --max-time 60 \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/keepalive" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+
+      # GitHub disables scheduled workflows after 60 days without repository
+      # activity; re-enabling on every run keeps this job alive indefinitely.
+      - name: Keep this workflow enabled
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/supabase-keepalive.yml/enable"
