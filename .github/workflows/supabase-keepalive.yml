@@ -30,13 +30,22 @@ jobs:
             echo "::error::SUPABASE_URL / SUPABASE_ANON_KEY secrets are not set"
             exit 1
           fi
-          curl --fail-with-body --silent --show-error \
+          case "$SUPABASE_URL" in
+            https://*.supabase.co|https://*.supabase.co/) ;;
+            *) echo "::error::SUPABASE_URL must be the API URL (https://<project-ref>.supabase.co from Project Settings → API), not a dashboard link"; exit 1 ;;
+          esac
+          body=$(curl --fail-with-body --silent --show-error \
             --retry 5 --retry-delay 30 --retry-all-errors --max-time 60 \
-            -X POST "$SUPABASE_URL/rest/v1/rpc/keepalive" \
+            -X POST "${SUPABASE_URL%/}/rest/v1/rpc/keepalive" \
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
             -H "Content-Type: application/json" \
-            -d '{}'
+            -d '{}')
+          if [ "$body" != "true" ]; then
+            echo "::error::Unexpected keepalive response (is the migration applied?): ${body:0:300}"
+            exit 1
+          fi
+          echo "Database pinged successfully"
 
       # GitHub disables scheduled workflows after 60 days without repository
       # activity; re-enabling on every run keeps this job alive indefinitely.
