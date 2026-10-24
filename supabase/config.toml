@@ -1,0 +1,54 @@
+# Supabase CLI project config (local development). Production auth settings
+# are configured in the dashboard — see README → "Supabase setup".
+
+project_id = "taskrypt"
+
+[api]
+port = 54321
+schemas = ["public"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 17
+
+[storage]
+file_size_limit = "50MiB"
+
+[auth]
+site_url = "taskrypt://auth/callback"
+additional_redirect_urls = ["taskrypt://auth/callback", "exp+taskrypt://auth/callback"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+
+[auth.rate_limit]
+email_sent = 4
+sign_in_sign_ups = 30
+token_verifications = 30
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = true
+otp_length = 6
+otp_expiry = 3600
+max_frequency = "60s"
+
+[auth.email.template.confirmation]
+subject = "Your Taskrypt verification code"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Reset your Taskrypt password"
+content_path = "./supabase/templates/recovery.html"
+
+[auth.password]
+min_length = 10
+password_requirements = "letters_digits"
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"

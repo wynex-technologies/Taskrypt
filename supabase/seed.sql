@@ -1,0 +1,6 @@
+-- Local development seed. Intentionally empty of user data: Taskrypt never ships
+-- sample rows in production code. Create a test user through the app (or the
+-- Supabase Studio) and the profile is bootstrapped by the on_auth_user_created trigger.
+--
+-- Optional: schedule housekeeping (requires the pg_cron extension).
+-- select cron.schedule('taskora-housekeeping', '17 3 * * *', $$select public.taskora_housekeeping()$$);
