@@ -289,7 +289,7 @@ export const VectorMascot = memo(function VectorMascot({ character, mood, size, 
     look.value = withTiming(0, { duration: 200 });
     burst.value = 0;
     if (reduceMotion) {
-      if (mood === 'welcome') armR.value = -70;
+      // Static poses only; arms stay at rest so no held pose looks stuck.
       if (mood === 'error') tilt.value = 6;
       return;
     }
@@ -316,7 +316,8 @@ export const VectorMascot = memo(function VectorMascot({ character, mood, size, 
         burst.value = withRepeat(withSequence(withTiming(1, { duration: 1000, easing: Easing.out(Easing.cubic) }), withTiming(0, { duration: 0 })), 3, false);
         break;
       case 'empty':
-        armR.value = withSpring(-60);
+        // A brief wave toward the add button, then back to rest.
+        armR.value = withSequence(withTiming(-60, { duration: 260 }), withDelay(900, withSpring(0)));
         look.value = withRepeat(withSequence(withTiming(1, { duration: 700 }), withDelay(600, withTiming(-1, { duration: 700 }))), -1, true);
         break;
       case 'loading':

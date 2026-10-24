@@ -3,7 +3,7 @@
  * write; React Query hooks listen and invalidate the matching query keys, so the
  * UI always renders straight from SQLite (the offline source of truth).
  */
-export type ChangeTopic = 'tasks' | 'lists' | 'tags' | 'categories' | 'documents' | 'folders' | 'sync';
+export type ChangeTopic = 'tasks' | 'lists' | 'tags' | 'categories' | 'documents' | 'folders' | 'khata' | 'sync';
 
 type Listener = (topics: ReadonlySet<ChangeTopic>) => void;
 

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { ArrowUpDown, ChevronRight, CloudDownload, Folder, FolderPlus, HardDrive, MoreHorizontal, Pencil, Search, Star, Trash2, Upload, X } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Alert, FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,7 +31,7 @@ const TYPE_FILTERS: { label: string; kinds: FileKind[] }[] = [
 
 const mimesFor = (kinds: FileKind[]) => [...new Set(Object.values(FILE_TYPES).filter((t) => kinds.includes(t.kind)).map((t) => t.mime))];
 
-export function VaultBrowser({ folderId }: { folderId: string | null }) {
+export function VaultBrowser({ folderId, tabs }: { folderId: string | null; /** Section switcher shown under the title at the vault root. */ tabs?: ReactNode }) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -120,6 +120,7 @@ export function VaultBrowser({ folderId }: { folderId: string | null }) {
         <IconButton icon={ArrowUpDown} label="Sort documents" onPress={() => setSortOpen(true)} />
         {!folderId ? <IconButton icon={HardDrive} label="Storage usage" onPress={() => router.push('/documents/storage')} /> : null}
       </View>
+      {tabs}
       {folderId && path.data ? (
         <ChipRow>
           <Chip label="Vault" onPress={() => router.dismissTo('/documents')} />

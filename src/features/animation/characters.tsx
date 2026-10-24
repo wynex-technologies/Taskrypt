@@ -8,7 +8,7 @@ import { Circle, Defs, Ellipse, G, LinearGradient, Path, RadialGradient, Rect, S
  * palette, so every mood and reaction works for all of them.
  */
 
-export const CHARACTER_IDS = ['kora', 'mochi', 'bolt', 'pip', 'ember'] as const;
+export const CHARACTER_IDS = ['kora', 'mochi', 'bolt', 'pip', 'luna'] as const;
 export type CharacterId = (typeof CHARACTER_IDS)[number];
 
 export const DEFAULT_CHARACTER: CharacterId = 'kora';
@@ -276,47 +276,50 @@ const pip: CharacterDef = {
   cheeks: true,
 };
 
-// ─── Ember · tiny flame spirit ───────────────────────────────────────────────
-const ember: CharacterDef = {
-  id: 'ember',
-  name: 'Ember',
-  species: 'Flame spirit',
-  tagline: 'Bright, bold and fired up for your goals.',
+// ─── Luna · moon bunny ───────────────────────────────────────────────────────
+const luna: CharacterDef = {
+  id: 'luna',
+  name: 'Luna',
+  species: 'Moon bunny',
+  tagline: 'Gentle, hopeful and quick to cheer you on.',
   palette: {
-    body: '#FF9F45',
-    bodyLight: '#FFE08A',
-    bodyShade: '#E8552B',
-    belly: '#FFE7A8',
-    ink: '#3A1D12',
-    mouth: '#3A1D12',
-    cheek: '#FF5F57',
-    arm: '#F07A3A',
-    accent: '#FFD45C',
-    accentDark: '#FF8A3D',
+    body: '#F4D9E1',
+    bodyLight: '#FFF4F7',
+    bodyShade: '#D99AAE',
+    belly: '#FFFFFF',
+    ink: '#3A2430',
+    mouth: '#3A2430',
+    cheek: '#F48FAE',
+    arm: '#D99AAE',
+    accent: '#F7A8BF',
+    accentDark: '#B9627F',
   },
   body: (p) => (
     <G>
-      <BodyGradient id="ember" p={p} />
-      <Path
-        d="M100 34 C108 56 128 64 146 84 C162 104 172 122 172 146 C172 182 142 206 100 206 C58 206 28 182 28 146 C28 118 44 98 60 84 C62 96 68 104 76 106 C72 84 84 58 100 34 Z"
-        fill="url(#emberBody)"
-      />
-      <Path d="M100 154 C116 166 134 172 134 186 C134 199 118 204 100 204 C82 204 66 199 66 186 C66 172 84 166 100 154 Z" fill="url(#emberBelly)" />
-      <Ellipse cx={74} cy={124} rx={10} ry={6} fill="#FFFFFF" opacity={0.3} transform="rotate(-40 74 124)" />
+      <BodyGradient id="luna" p={p} />
+      {/* Cotton tail peeks out behind the right side. */}
+      <Circle cx={164} cy={184} r={15} fill={p.belly} stroke={p.bodyShade} strokeWidth={2} />
+      <Path d={EGG} fill="url(#lunaBody)" />
+      <Path d={EGG_BELLY} fill="url(#lunaBelly)" />
+      <Highlight />
+      <Feet color={p.bodyShade} />
     </G>
   ),
   top: (p) => (
     <G>
-      <Path d="M40 70 C24 60 22 42 32 28 C34 38 38 42 41 36 C44 24 40 14 46 2 C60 18 64 38 58 52 C54 62 48 68 40 70 Z" fill={p.accentDark} />
-      <Path d="M41 66 C32 58 32 48 37 40 C40 46 44 44 46 38 C52 46 52 58 47 64 Z" fill={p.accent} />
+      <Path d="M30 72 C18 52 12 24 20 8 C26 -2 38 2 40 14 C44 32 44 54 42 72 Z" fill={p.body} stroke={p.bodyShade} strokeWidth={2} />
+      <Path d="M70 72 C82 52 88 24 80 8 C74 -2 62 2 60 14 C56 32 56 54 58 72 Z" fill={p.body} stroke={p.bodyShade} strokeWidth={2} />
+      <Path d="M32 64 C24 48 21 28 25 16 C28 10 34 12 35 18 C38 32 38 50 37 64 Z" fill={p.accent} />
+      <Path d="M68 64 C76 48 79 28 75 16 C72 10 66 12 65 18 C62 32 62 50 63 64 Z" fill={p.accent} />
     </G>
   ),
-  topBox: DEFAULT_TOP,
-  topSway: 18,
+  topBox: { x: 50, y: 0, w: 100, h: 72 },
+  topSway: 8,
   cheeks: true,
+  faceExtra: (p) => <Ellipse cx={100} cy={129} rx={5} ry={3.5} fill={p.accentDark} />,
 };
 
-export const CHARACTERS: Record<CharacterId, CharacterDef> = { kora, mochi, bolt, pip, ember };
+export const CHARACTERS: Record<CharacterId, CharacterDef> = { kora, mochi, bolt, pip, luna };
 
 /** Resolves a stored id, falling back to Kora for unknown or retired ids. */
 export function getCharacter(id: string | null | undefined): CharacterDef {

@@ -115,6 +115,21 @@ export type LocalDocument = VaultDocument & {
 };
 export type LocalFolder = DocumentFolder & { sync_state: LocalSyncState };
 
+/** Khata Book entry. `bought`: money spent on something; `gave`: paid to someone; `got`: received from someone. */
+export type KhataKind = 'bought' | 'gave' | 'got';
+export type KhataEntry = SyncedRow & {
+  kind: KhataKind;
+  /** Person or shop. Required for gave / got. */
+  party: string | null;
+  /** What was bought, or what the money was for. Required for bought. */
+  description: string | null;
+  /** Whole paise, so sums never drift. */
+  amount_paise: number;
+  /** Local calendar day, YYYY-MM-DD. */
+  entry_date: string;
+};
+export type LocalKhataEntry = KhataEntry & { sync_state: LocalSyncState };
+
 export type SyncEntity =
   | 'task_lists'
   | 'task_categories'
@@ -122,7 +137,8 @@ export type SyncEntity =
   | 'tasks'
   | 'task_tag_assignments'
   | 'document_folders'
-  | 'documents';
+  | 'documents'
+  | 'khata_entries';
 
 /** Order matters: parents before children so foreign keys resolve on the server. */
 export const SYNC_ENTITIES: readonly SyncEntity[] = [
@@ -133,6 +149,7 @@ export const SYNC_ENTITIES: readonly SyncEntity[] = [
   'task_tag_assignments',
   'document_folders',
   'documents',
+  'khata_entries',
 ] as const;
 
 export type Profile = {

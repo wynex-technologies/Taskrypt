@@ -266,3 +266,30 @@ describe('keepalive', () => {
     assert.deepEqual(r.rows, [{ ok: true }]);
   });
 });
+
+describe('khata_entries', () => {
+  const entry = (o = {}) => row({ kind: 'gave', party: 'Ravi', description: null, amount_paise: 125050, entry_date: '2026-10-22', ...o });
+
+  it('syncs owner-only entries with exact paise amounts', async () => {
+    const e = entry();
+    const [res] = await push(A, [{ op_id: randomUUID(), entity: 'khata_entries', row: e }]);
+    assert.equal(res.status, 'applied');
+    assert.equal(Number(res.row.amount_paise), 125050);
+    assert.equal(res.row.entry_date, '2026-10-22');
+    const asB = await as(B, (tx) => tx.query('select id from public.khata_entries'));
+    assert.equal(asB.rows.length, 0);
+    const anon = await as(null, (tx) => tx.query('select * from public.khata_entries').catch((err) => ({ error: err.message })));
+    assert.ok(anon.error ? /permission denied/.test(anon.error) : anon.rows.length === 0);
+  });
+
+  it('rejects incomplete or invalid entries', async () => {
+    const bad = [
+      entry({ party: null }),
+      entry({ kind: 'bought', party: null, description: null }),
+      entry({ amount_paise: 0 }),
+      entry({ kind: 'lent' }),
+    ];
+    const results = await push(A, bad.map((r) => ({ op_id: randomUUID(), entity: 'khata_entries', row: r })));
+    assert.deepEqual(results.map((r) => r.status), ['rejected', 'rejected', 'rejected', 'rejected']);
+  });
+});

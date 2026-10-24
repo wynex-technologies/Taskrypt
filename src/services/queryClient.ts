@@ -27,6 +27,7 @@ const TOPIC_KEYS: Record<ChangeTopic, string[]> = {
   categories: ['categories', 'tasks'],
   documents: ['documents', 'document', 'storage', 'search', 'folders'],
   folders: ['folders', 'documents'],
+  khata: ['khata'],
   sync: ['sync'],
 };
 

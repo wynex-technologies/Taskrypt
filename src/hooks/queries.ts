@@ -4,6 +4,7 @@ import { getDb } from '@/database';
 import { useAuthStore } from '@/features/auth/authStore';
 import { fetchProfile, fetchStorageUsage } from '@/features/profile/profileService';
 import { documentRepository, folderRepository, type DocumentFilter } from '@/repositories/documentRepository';
+import { khataRepository, type KhataFilter } from '@/repositories/khataRepository';
 import * as queue from '@/repositories/syncQueueRepository';
 import { categoryRepository, listRepository, tagRepository, taskRepository, type TaskFilter } from '@/repositories/taskRepository';
 import { useIsOnline } from '@/stores/networkStore';
@@ -123,4 +124,19 @@ export function useProfile() {
 export function useQueueItems() {
   const uid = useUid();
   return useQuery({ queryKey: ['sync', uid, 'queue'], queryFn: () => queue.listAll(getDb()), enabled: !!uid });
+}
+
+export function useKhataEntries(filter: KhataFilter) {
+  const uid = useUid();
+  return useQuery({ queryKey: ['khata', uid, 'entries', filter], queryFn: () => khataRepository.list(filter), enabled: !!uid, placeholderData: (prev) => prev });
+}
+
+export function useKhataTotals(from: string, to: string) {
+  const uid = useUid();
+  return useQuery({ queryKey: ['khata', uid, 'totals', from, to], queryFn: () => khataRepository.totals({ from, to }), enabled: !!uid });
+}
+
+export function useKhataBalances() {
+  const uid = useUid();
+  return useQuery({ queryKey: ['khata', uid, 'balances'], queryFn: () => khataRepository.balances(), enabled: !!uid });
 }
