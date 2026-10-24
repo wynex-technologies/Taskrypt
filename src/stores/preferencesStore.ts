@@ -37,7 +37,7 @@ type Actions = {
 };
 
 export const DEFAULT_PREFERENCES: Preferences = {
-  themePreference: 'system',
+  themePreference: 'light',
   motionPreference: 'system',
   hapticsEnabled: true,
   onboardingComplete: false,
