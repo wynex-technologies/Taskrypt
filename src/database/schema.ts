@@ -83,6 +83,22 @@ const MIGRATIONS: string[] = [
   CREATE INDEX IF NOT EXISTS idx_queue_order ON sync_queue (status, seq);
   CREATE INDEX IF NOT EXISTS idx_queue_entity ON sync_queue (entity, entity_id);
   `,
+  // v2, v3 — a credential locker that was removed before release; kept as
+  // no-op drops so version numbers stay stable on devices that ran them.
+  `DROP TABLE IF EXISTS credentials;`,
+  `DROP TABLE IF EXISTS credentials;`,
+  // v4 — Khata Book: money spent, given and received.
+  `
+  DROP TABLE IF EXISTS credentials;
+  CREATE TABLE IF NOT EXISTS khata_entries (${SYNC_COLUMNS},
+    kind TEXT NOT NULL,
+    party TEXT,
+    description TEXT,
+    amount_paise INTEGER NOT NULL,
+    entry_date TEXT NOT NULL);
+  CREATE INDEX IF NOT EXISTS idx_khata_date ON khata_entries (entry_date) WHERE deleted_at IS NULL;
+  CREATE INDEX IF NOT EXISTS idx_khata_party ON khata_entries (party COLLATE NOCASE) WHERE deleted_at IS NULL;
+  `,
 ];
 
 export const SCHEMA_VERSION = MIGRATIONS.length;

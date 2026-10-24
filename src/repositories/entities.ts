@@ -59,6 +59,7 @@ export const ENTITY_CONFIG: Record<SyncEntity, EntityConfig> = {
     json: [],
     topic: 'documents',
   },
+  khata_entries: { columns: [...BASE, 'kind', 'party', 'description', 'amount_paise', 'entry_date'], booleans: [], json: [], topic: 'khata' },
 };
 
 /** Device-only JSON columns. */
