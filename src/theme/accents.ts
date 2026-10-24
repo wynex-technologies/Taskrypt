@@ -19,7 +19,7 @@ export const CHARACTER_ACCENT: Record<CharacterId, AccentId> = {
   mochi: 'lavender',
   bolt: 'ocean',
   pip: 'teal',
-  ember: 'sunset',
+  luna: 'rose',
 };
 
 type AccentDef = { label: string; light: string; dark: string };
